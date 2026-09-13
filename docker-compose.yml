@@ -55,11 +55,14 @@ services:
     build:
       context: ./apps/storefront
       dockerfile: Dockerfile
+      # NEXT_PUBLIC_* variables are baked in at build time, not read at
+      # runtime — set this to wherever the backend is actually reachable
+      # from the *browser* (not the docker network) before building.
+      args:
+        NEXT_PUBLIC_API_URL: http://localhost:4000/api
     restart: unless-stopped
     depends_on:
       - backend
-    environment:
-      NEXT_PUBLIC_API_URL: http://localhost:4000/api
     ports:
       - '3000:3000'
 
@@ -67,11 +70,13 @@ services:
     build:
       context: ./apps/admin
       dockerfile: Dockerfile
+      # Same caveat as storefront's NEXT_PUBLIC_API_URL — Vite bakes this in
+      # at build time.
+      args:
+        VITE_API_URL: http://localhost:4000/api
     restart: unless-stopped
     depends_on:
       - backend
-    environment:
-      VITE_API_URL: http://localhost:4000/api
     ports:
       - '3001:80'
 
