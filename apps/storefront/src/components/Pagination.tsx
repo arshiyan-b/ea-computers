@@ -26,7 +26,7 @@ export function Pagination({
 
   return (
     <nav className="mt-8 flex items-center justify-center gap-1" aria-label="Pagination">
-      <PageLink page={meta.page - 1} disabled={meta.page <= 1} href={hrefFor(meta.page - 1)}>
+      <PageLink disabled={meta.page <= 1} href={hrefFor(meta.page - 1)}>
         Prev
       </PageLink>
       {pages.map((page, i) => (
@@ -42,7 +42,7 @@ export function Pagination({
           </Link>
         </span>
       ))}
-      <PageLink page={meta.page + 1} disabled={meta.page >= meta.totalPages} href={hrefFor(meta.page + 1)}>
+      <PageLink disabled={meta.page >= meta.totalPages} href={hrefFor(meta.page + 1)}>
         Next
       </PageLink>
     </nav>

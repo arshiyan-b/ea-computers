@@ -30,18 +30,25 @@ describe('CartService', () => {
 
   describe('getOrCreateCart', () => {
     it('reuses an existing user cart', async () => {
-      prisma.cart.findUnique.mockResolvedValue({ id: 'cart-1', userId: 'u1' });
+      prisma.cart.upsert.mockResolvedValue({ id: 'cart-1', userId: 'u1' });
       const cart = await service.getOrCreateCart('u1', undefined);
       expect(cart.id).toBe('cart-1');
-      expect(prisma.cart.create).not.toHaveBeenCalled();
+      expect(prisma.cart.upsert).toHaveBeenCalledWith({
+        where: { userId: 'u1' },
+        update: {},
+        create: { userId: 'u1' },
+      });
     });
 
-    it('creates a guest cart by session id when none exists', async () => {
-      prisma.cart.findUnique.mockResolvedValue(null);
-      prisma.cart.create.mockResolvedValue({ id: 'cart-2', sessionId: 'sess-1' });
+    it('creates a guest cart by session id when none exists (race-safe upsert)', async () => {
+      prisma.cart.upsert.mockResolvedValue({ id: 'cart-2', sessionId: 'sess-1' });
       const cart = await service.getOrCreateCart(undefined, 'sess-1');
       expect(cart.id).toBe('cart-2');
-      expect(prisma.cart.create).toHaveBeenCalledWith({ data: { sessionId: 'sess-1' } });
+      expect(prisma.cart.upsert).toHaveBeenCalledWith({
+        where: { sessionId: 'sess-1' },
+        update: {},
+        create: { sessionId: 'sess-1' },
+      });
     });
 
     it('throws when neither a user nor a session is available', async () => {
@@ -129,10 +136,9 @@ describe('CartService', () => {
       };
       prisma.cart.findUnique.mockImplementation(({ where }: any) => {
         if (where.sessionId) return guestCart;
-        if (where.userId) return null; // no existing user cart yet
         return null;
       });
-      prisma.cart.create.mockResolvedValue({ id: 'user-cart', userId: 'user-1' });
+      prisma.cart.upsert.mockResolvedValue({ id: 'user-cart', userId: 'user-1' });
       prisma.product.findUnique.mockResolvedValue(fakeProduct({ stock: 5 }));
       prisma.cartItem.findUnique.mockResolvedValue(null);
 

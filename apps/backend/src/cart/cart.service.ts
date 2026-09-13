@@ -39,17 +39,27 @@ export interface CartView {
 export class CartService {
   constructor(private readonly prisma: PrismaService) {}
 
-  /** Finds (or lazily creates) the cart for an authenticated user or a guest session. */
+  /**
+   * Finds (or lazily creates) the cart for an authenticated user or a guest
+   * session. Uses `upsert` rather than a separate find-then-create so two
+   * concurrent requests for a brand-new cart (e.g. the header and the page
+   * both loading at once) can never race each other into a unique-constraint
+   * violation on userId/sessionId.
+   */
   async getOrCreateCart(userId?: string, sessionId?: string): Promise<Cart> {
     if (userId) {
-      const existing = await this.prisma.cart.findUnique({ where: { userId } });
-      if (existing) return existing;
-      return this.prisma.cart.create({ data: { userId } });
+      return this.prisma.cart.upsert({
+        where: { userId },
+        update: {},
+        create: { userId },
+      });
     }
     if (sessionId) {
-      const existing = await this.prisma.cart.findUnique({ where: { sessionId } });
-      if (existing) return existing;
-      return this.prisma.cart.create({ data: { sessionId } });
+      return this.prisma.cart.upsert({
+        where: { sessionId },
+        update: {},
+        create: { sessionId },
+      });
     }
     throw new BadRequestException('Unable to resolve a cart without a user or session');
   }
