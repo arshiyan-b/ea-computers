@@ -9,6 +9,9 @@ Built as a modular monolith:
 - **Storefront** — Next.js (App Router) + TypeScript + Tailwind CSS + Zustand
 - **Admin** — Refine + Ant Design, consuming the same REST API
 
+Everything runs as plain Node.js processes on your machine — no containers anywhere in
+this project.
+
 ---
 
 ## 1. Architecture
@@ -57,28 +60,39 @@ PostgreSQL, never trusted from the client.**
 ## 2. Prerequisites
 
 - Node.js 20+ and npm 10+
-- Docker Desktop (for PostgreSQL/Redis, or the full stack)
-- A PostgreSQL 16 instance (via Docker, or your own install)
-
-> **Note:** if you already have a local PostgreSQL server on port `5432`, the provided
-> `docker-compose.yml` maps its Postgres container to host port **5433** instead, to
-> avoid a conflict. Adjust `DATABASE_URL` accordingly if you change this.
+- A local PostgreSQL server (any recent version — developed against 16, tested fine
+  against 18 too), installed directly on your machine (e.g. the official Windows/Mac
+  installer, or your OS package manager)
 
 ---
 
 ## 3. Quick Start (local development)
 
-### 3.1 Start PostgreSQL (and Redis, reserved for future use)
+### 3.1 Create the database
+
+Using `psql` (or pgAdmin, or any client) against your local Postgres server:
 
 ```bash
-docker compose up -d postgres redis
+psql -U postgres -c "CREATE DATABASE ea_computers;"
 ```
 
 ### 3.2 Backend
 
 ```bash
 cd apps/backend
-cp .env.example .env      # adjust if needed — defaults match docker-compose above
+cp .env.example .env
+```
+
+Edit `.env` and set `DATABASE_URL` to match your local Postgres (adjust user/password/port
+as needed):
+
+```env
+DATABASE_URL="postgresql://postgres:YOUR_PASSWORD@localhost:5432/ea_computers?schema=public"
+```
+
+Then:
+
+```bash
 npm install
 npx prisma generate
 npx prisma migrate dev    # creates the schema
@@ -122,7 +136,7 @@ npm run dev                # http://localhost:5174
 Each app has an `.env.example` documenting its variables. Backend highlights:
 
 ```env
-DATABASE_URL=postgresql://postgres:postgres@localhost:5433/ea_computers?schema=public
+DATABASE_URL=postgresql://postgres:postgres@localhost:5432/ea_computers?schema=public
 JWT_SECRET=change-me-to-a-long-random-string-in-production
 JWT_EXPIRES_IN=7d
 CORS_ORIGINS=http://localhost:3000,http://localhost:3001,http://localhost:5173,http://localhost:5174
@@ -136,6 +150,9 @@ Spaces, Cloudflare R2, ...) via `S3_ENDPOINT`/`S3_ACCESS_KEY`/`S3_SECRET_KEY`/`S
 `STORAGE_PROVIDER=cloudinary` is the documented alternative. Neither is required for local
 development — the default `local` provider writes to `apps/backend/uploads/` and serves it
 back through the API.
+
+`REDIS_URL` is present in `.env.example` but **not required to run the app** — it's
+reserved for future caching/rate-limiting/queue use (see §9) and nothing reads it today.
 
 **Never commit real secrets.** `.env` files are gitignored; only `.env.example` files are
 tracked.
@@ -191,24 +208,21 @@ protected endpoints interactively.
 
 ---
 
-## 8. Docker (full stack)
+## 8. Production deployment notes
 
-```bash
-docker compose up -d --build
-```
+There's no Docker setup in this project by design — deploy each app the way you'd deploy
+any plain Node.js/static app:
 
-This builds and runs Postgres, Redis, the backend API (port 4000, running
-`prisma migrate deploy` on boot), the storefront (port 3000) and the admin dashboard
-(port 3001). Run the seed script once against the containerized database if you want demo
-data:
-
-```bash
-docker compose exec backend npx prisma db seed
-```
-
-`NEXT_PUBLIC_API_URL` and `VITE_API_URL` are baked in at **image build time** (a
-Next.js/Vite constraint) via `build.args` in `docker-compose.yml` — update those, not the
-runtime `environment:` block, if the backend's browser-facing URL changes.
+- **Backend**: `npm run build` then `node dist/main.js` (run `npx prisma migrate deploy`
+  against the production database first). Needs a long-lived process manager (systemd,
+  pm2, your host's equivalent) and all the `.env` variables set as real environment
+  variables, not a checked-in file.
+- **Storefront**: `npm run build` then `npm run start` (Next.js's own Node server), or
+  deploy to any platform with first-class Next.js support. `NEXT_PUBLIC_API_URL` is baked
+  in at build time — set it before building.
+- **Admin**: `npm run build` produces a static `dist/` folder (Vite) — serve it from any
+  static host/CDN with SPA fallback routing (rewrite all paths to `index.html`).
+  `VITE_API_URL` is also baked in at build time.
 
 ---
 
@@ -217,8 +231,8 @@ runtime `environment:` block, if the backend's browser-facing URL changes.
 Per the project's own scope: no online payment gateway (Cash on Delivery only), no
 microservices, no Meilisearch (Postgres `contains` search for now — `products/` is
 structured so a real search engine can replace it without touching the controller layer),
-no reviews/wishlist/coupons. These are documented as straightforward future modules, not
-oversights:
+no reviews/wishlist/coupons, no Redis-backed caching yet (the config is there, unused).
+These are documented as straightforward future modules, not oversights:
 
 ```text
 PaymentsModule   ShippingModule   ReviewsModule   WishlistModule
@@ -245,6 +259,5 @@ ea-computers/
 │   ├── backend/     NestJS REST API
 │   ├── storefront/  Next.js customer storefront
 │   └── admin/       Refine + Ant Design admin dashboard
-├── docker-compose.yml
 └── README.md
 ```
