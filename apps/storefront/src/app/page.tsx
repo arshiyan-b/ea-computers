@@ -1,9 +1,9 @@
 import Link from 'next/link';
-import Image from 'next/image';
 import { listProducts } from '@/lib/products';
 import { listCategories } from '@/lib/categories';
 import { listBrands } from '@/lib/brands';
 import { ProductCard } from '@/components/ProductCard';
+import { HeroSlider } from '@/components/HeroSlider';
 
 export const revalidate = 60;
 
@@ -21,7 +21,7 @@ export default async function HomePage() {
 
   return (
     <div>
-      <Hero />
+      <HeroSlider />
 
       <section className="container-page py-12">
         <SectionHeader title="Shop by Category" subtitle="Find exactly what your build needs" />
@@ -104,52 +104,6 @@ export default async function HomePage() {
 
       <WhyChooseUs />
     </div>
-  );
-}
-
-function Hero() {
-  return (
-    <section className="relative overflow-hidden bg-slate-900 text-white">
-      <div className="container-page grid gap-8 py-16 lg:grid-cols-2 lg:py-24">
-        <div className="flex flex-col justify-center gap-5">
-          <span className="w-fit animate-fade-in-up rounded-full bg-brand-600/20 px-3 py-1 text-xs font-semibold text-brand-300">
-            Pakistan&apos;s Tech Hardware Store
-          </span>
-          <h1 className="animate-fade-in-up text-3xl font-extrabold leading-tight [animation-delay:100ms] sm:text-4xl lg:text-5xl">
-            Build. Upgrade. <span className="text-brand-400">Game harder.</span>
-          </h1>
-          <p className="max-w-lg animate-fade-in-up text-slate-300 [animation-delay:200ms]">
-            Genuine laptops, desktop PCs, graphics cards and components — competitively priced,
-            with Cash on Delivery available nationwide.
-          </p>
-          <div className="flex animate-fade-in-up flex-wrap gap-3 [animation-delay:300ms]">
-            <Link
-              href="/products"
-              className="rounded-md bg-brand-600 px-6 py-3 text-sm font-semibold text-white transition-all duration-200 hover:-translate-y-0.5 hover:bg-brand-500 hover:shadow-lg hover:shadow-brand-600/30 active:translate-y-0"
-            >
-              Shop All Products
-            </Link>
-            <Link
-              href="/categories/graphics-cards"
-              className="rounded-md border border-white/30 px-6 py-3 text-sm font-semibold text-white transition-all duration-200 hover:-translate-y-0.5 hover:bg-white/10 active:translate-y-0"
-            >
-              Browse Graphics Cards
-            </Link>
-          </div>
-        </div>
-        <div className="relative hidden animate-scale-in lg:block [animation-delay:150ms]">
-          <div className="absolute inset-0 -z-10 animate-pulse rounded-3xl bg-gradient-to-br from-brand-600/30 to-transparent blur-2xl [animation-duration:4s]" />
-          <Image
-            src="https://picsum.photos/seed/ea-computers-hero/900/700"
-            alt="High-performance gaming PC build"
-            width={900}
-            height={700}
-            priority
-            className="rounded-3xl object-cover shadow-2xl transition-transform duration-700 hover:scale-[1.02]"
-          />
-        </div>
-      </div>
-    </section>
   );
 }
 
