@@ -14,6 +14,33 @@ this project.
 
 ---
 
+## Starting All Servers
+
+Four things can run locally — three servers plus one optional database UI. One command
+each, in its own terminal tab (leave each running):
+
+```bash
+# 1. Backend API + Swagger docs
+cd apps/backend && npm run start:dev       # http://localhost:4000/api  ·  http://localhost:4000/docs
+
+# 2. Storefront
+cd apps/storefront && npm run dev          # http://localhost:3000
+
+# 3. Admin dashboard
+cd apps/admin && npm run dev               # http://localhost:5174
+
+# 4. (optional) Prisma Studio — browse/edit the database in a UI
+cd apps/backend && npx prisma studio       # http://localhost:5555 (opens automatically)
+```
+
+Start the backend **first** — the storefront and admin both call it on load and will show
+fetch errors until it's up. To stop any of them, focus its terminal and press `Ctrl+C`.
+
+This assumes you've already done the one-time setup (`npm install`, `.env` files,
+migrating/seeding the database) — that's covered in §3 below.
+
+---
+
 ## 1. Architecture
 
 ```text
@@ -131,32 +158,9 @@ npm run dev                # http://localhost:5174
 
 ### 3.5 Running all three servers together
 
-Each app (§3.2–3.4) is its own long-running process — start them in **three separate
-terminal tabs/windows**, left open, one command per tab:
-
-```bash
-# terminal 1
-cd apps/backend && npm run start:dev
-
-# terminal 2
-cd apps/storefront && npm run dev
-
-# terminal 3
-cd apps/admin && npm run dev
-```
-
-(Run the one-time `npm install`/`.env` setup from §3.2–3.4 first if you haven't already.)
-Once all three are up:
-
-| App              | URL                          |
-| ----------------- | ----------------------------- |
-| Backend API        | http://localhost:4000/api    |
-| Swagger docs       | http://localhost:4000/docs   |
-| Storefront          | http://localhost:3000        |
-| Admin dashboard     | http://localhost:5174        |
-
-Start the backend first — the storefront and admin both call it on load and will show
-fetch errors until it's up. To stop a server, focus its terminal and press `Ctrl+C`.
+Once you've done the one-time setup in §3.1–3.4 for each app, see **"Starting All
+Servers"** at the top of this README for the commands to bring everything up (and back up
+again next time) — one per terminal tab.
 
 ---
 
@@ -199,7 +203,7 @@ Common commands (run from `apps/backend`):
 ```bash
 npx prisma migrate dev --name <description>   # create + apply a new migration
 npx prisma migrate deploy                     # apply pending migrations (production)
-npx prisma studio                             # visual data browser
+npx prisma studio                             # visual data browser — http://localhost:5555
 npx prisma migrate reset --force              # ⚠ wipes and re-seeds the dev database
 ```
 
