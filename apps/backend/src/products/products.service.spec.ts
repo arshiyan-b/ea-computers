@@ -55,7 +55,7 @@ describe('ProductsService', () => {
 
   describe('findAll', () => {
     it('returns an empty page for an unknown category slug (never leaks the full catalog)', async () => {
-      prisma.category.findUnique.mockResolvedValue(null); // slug lookup for filter
+      prisma.category.findMany.mockResolvedValue([]); // slug lookup for filter
       const result = await service.findAll({ category: 'not-a-real-category' } as any, false);
       expect(result.data).toEqual([]);
       expect(result.meta.total).toBe(0);
@@ -70,6 +70,20 @@ describe('ProductsService', () => {
 
       const whereArg = prisma.product.findMany.mock.calls[0][0].where;
       expect(whereArg.isActive).toBe(true);
+    });
+
+    it('matches any of several comma-separated category slugs', async () => {
+      prisma.category.findMany.mockResolvedValue([{ id: 'cat-1' }, { id: 'cat-2' }]);
+      prisma.product.findMany.mockResolvedValue([]);
+      prisma.product.count.mockResolvedValue(0);
+
+      await service.findAll({ category: 'laptops,desktop-pcs' } as any, false);
+
+      expect(prisma.category.findMany).toHaveBeenCalledWith({
+        where: { slug: { in: ['laptops', 'desktop-pcs'] } },
+      });
+      const whereArg = prisma.product.findMany.mock.calls[0][0].where;
+      expect(whereArg.categoryId).toEqual({ in: ['cat-1', 'cat-2'] });
     });
   });
 

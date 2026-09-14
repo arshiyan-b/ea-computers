@@ -1,6 +1,15 @@
 import { Prisma } from '@prisma/client';
 import { QueryProductDto } from './dto/query-product.dto';
 
+/** Splits a "laptops,desktop-pcs" query param into ["laptops", "desktop-pcs"]. */
+export function parseSlugList(value?: string): string[] {
+  if (!value) return [];
+  return value
+    .split(',')
+    .map((s) => s.trim())
+    .filter(Boolean);
+}
+
 /**
  * Builds the Prisma `where` clause for product search/filtering.
  *
@@ -12,7 +21,7 @@ import { QueryProductDto } from './dto/query-product.dto';
  */
 export function buildProductWhere(
   query: QueryProductDto,
-  options: { isAdmin: boolean; categoryId?: string; brandId?: string },
+  options: { isAdmin: boolean; categoryIds?: string[]; brandIds?: string[] },
 ): Prisma.ProductWhereInput {
   const where: Prisma.ProductWhereInput = {};
 
@@ -20,8 +29,12 @@ export function buildProductWhere(
     where.isActive = true;
   }
 
-  if (options.categoryId) where.categoryId = options.categoryId;
-  if (options.brandId) where.brandId = options.brandId;
+  if (options.categoryIds?.length) {
+    where.categoryId = options.categoryIds.length === 1 ? options.categoryIds[0] : { in: options.categoryIds };
+  }
+  if (options.brandIds?.length) {
+    where.brandId = options.brandIds.length === 1 ? options.brandIds[0] : { in: options.brandIds };
+  }
 
   if (query.minPrice !== undefined || query.maxPrice !== undefined) {
     where.price = {

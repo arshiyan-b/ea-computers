@@ -174,7 +174,7 @@ export default function CheckoutPage() {
           <button
             type="submit"
             disabled={submitting}
-            className="w-full rounded-md bg-brand-700 py-3 text-sm font-semibold text-white hover:bg-brand-800 disabled:opacity-60 lg:hidden"
+            className="w-full rounded-md bg-brand-700 py-3 text-sm font-semibold text-white transition-all hover:bg-brand-800 active:scale-[0.98] disabled:opacity-60 lg:hidden"
           >
             {submitting ? 'Placing order…' : 'Place Order'}
           </button>
@@ -205,7 +205,7 @@ export default function CheckoutPage() {
           <button
             onClick={handleSubmit}
             disabled={submitting}
-            className="mt-6 hidden w-full rounded-md bg-brand-700 py-3 text-sm font-semibold text-white hover:bg-brand-800 disabled:opacity-60 lg:block"
+            className="mt-6 hidden w-full rounded-md bg-brand-700 py-3 text-sm font-semibold text-white transition-all hover:bg-brand-800 active:scale-[0.98] disabled:opacity-60 lg:block"
           >
             {submitting ? 'Placing order…' : 'Place Order'}
           </button>
@@ -272,7 +272,7 @@ function OrderConfirmation({ order }: { order: Order }) {
           <Link href="/products" className="rounded-md border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-white">
             Continue Shopping
           </Link>
-          <Link href="/account/orders" className="rounded-md bg-brand-700 px-4 py-2 text-sm font-medium text-white hover:bg-brand-800">
+          <Link href="/account/orders" className="rounded-md bg-brand-700 px-4 py-2 text-sm font-medium text-white transition-all hover:bg-brand-800 hover:-translate-y-0.5 active:translate-y-0">
             View My Orders
           </Link>
         </div>

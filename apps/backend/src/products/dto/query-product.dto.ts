@@ -9,12 +9,18 @@ export class QueryProductDto extends PaginationQueryDto {
   @IsString()
   search?: string;
 
-  @ApiPropertyOptional({ description: 'Category slug' })
+  @ApiPropertyOptional({
+    description: 'Category slug, or several comma-separated (matches any of them)',
+    example: 'laptops,desktop-pcs',
+  })
   @IsOptional()
   @IsString()
   category?: string;
 
-  @ApiPropertyOptional({ description: 'Brand slug' })
+  @ApiPropertyOptional({
+    description: 'Brand slug, or several comma-separated (matches any of them)',
+    example: 'asus,msi',
+  })
   @IsOptional()
   @IsString()
   brand?: string;

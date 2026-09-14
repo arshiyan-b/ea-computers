@@ -16,7 +16,7 @@ export function Toaster() {
           key={toast.id}
           role="status"
           className={clsx(
-            'flex items-start justify-between gap-3 rounded-lg border px-4 py-3 text-sm shadow-lg',
+            'flex animate-slide-in-right items-start justify-between gap-3 rounded-lg border px-4 py-3 text-sm shadow-lg transition-all',
             toast.variant === 'success' && 'border-green-200 bg-green-50 text-green-800',
             toast.variant === 'error' && 'border-red-200 bg-red-50 text-red-800',
             toast.variant === 'info' && 'border-slate-200 bg-white text-slate-800',
@@ -26,7 +26,7 @@ export function Toaster() {
           <button
             onClick={() => dismiss(toast.id)}
             aria-label="Dismiss notification"
-            className="text-current/60 hover:text-current"
+            className="text-current/60 transition-transform hover:scale-110 hover:text-current"
           >
             ✕
           </button>

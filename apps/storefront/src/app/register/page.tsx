@@ -33,7 +33,7 @@ export default function RegisterPage() {
 
   return (
     <div className="container-page flex min-h-[70vh] items-center justify-center py-16">
-      <div className="w-full max-w-sm rounded-xl border border-slate-200 bg-white p-8">
+      <div className="w-full max-w-sm animate-scale-in rounded-xl border border-slate-200 bg-white p-8 shadow-sm">
         <h1 className="mb-1 text-xl font-bold text-slate-900">Create your account</h1>
         <p className="mb-6 text-sm text-slate-500">Join EA Computers to track your orders.</p>
 
@@ -69,7 +69,7 @@ export default function RegisterPage() {
           <button
             type="submit"
             disabled={submitting}
-            className="w-full rounded-md bg-brand-700 py-2.5 text-sm font-semibold text-white hover:bg-brand-800 disabled:opacity-60"
+            className="w-full rounded-md bg-brand-700 py-2.5 text-sm font-semibold text-white transition-all hover:bg-brand-800 active:scale-[0.98] disabled:opacity-60"
           >
             {submitting ? 'Creating account…' : 'Create Account'}
           </button>

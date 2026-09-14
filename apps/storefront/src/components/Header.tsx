@@ -71,11 +71,17 @@ export function Header() {
         </form>
 
         <div className="ml-auto flex items-center gap-4 md:ml-0">
-          <Link href="/cart" className="relative flex items-center gap-1 text-slate-700 hover:text-brand-700">
+          <Link
+            href="/cart"
+            className="relative flex items-center gap-1 text-slate-700 transition-transform hover:scale-105 hover:text-brand-700 active:scale-95"
+          >
             <CartIcon />
             <span className="hidden text-sm font-medium sm:inline">Cart</span>
             {itemCount > 0 && (
-              <span className="absolute -right-2 -top-2 grid h-5 w-5 place-items-center rounded-full bg-brand-700 text-[11px] font-semibold text-white">
+              <span
+                key={itemCount}
+                className="absolute -right-2 -top-2 grid h-5 w-5 animate-pop place-items-center rounded-full bg-brand-700 text-[11px] font-semibold text-white"
+              >
                 {itemCount > 99 ? '99+' : itemCount}
               </span>
             )}
@@ -113,7 +119,7 @@ export function Header() {
       </div>
 
       {mobileOpen && (
-        <div className="border-t border-slate-200 bg-white px-4 pb-4 pt-3 lg:hidden">
+        <div className="animate-fade-in-up border-t border-slate-200 bg-white px-4 pb-4 pt-3 duration-200 lg:hidden">
           <form onSubmit={handleSearch} className="mb-3 flex">
             <input
               type="search"

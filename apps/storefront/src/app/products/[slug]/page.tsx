@@ -130,8 +130,8 @@ export default async function ProductDetailPage({ params }: Props) {
         <section className="mt-16">
           <h2 className="mb-6 text-xl font-bold text-slate-900">Related Products</h2>
           <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
-            {related.data.map((p) => (
-              <ProductCard key={p.id} product={p} />
+            {related.data.map((p, i) => (
+              <ProductCard key={p.id} product={p} index={i} />
             ))}
           </div>
         </section>

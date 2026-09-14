@@ -7,7 +7,7 @@ import { QueryProductDto } from './dto/query-product.dto';
 import { slugify } from '../common/utils/slugify.util';
 import { buildPaginationMeta, PaginatedResult } from '../common/dto/paginated-result.dto';
 import { resolveSortField } from '../common/utils/sort.util';
-import { buildProductWhere } from './products-query.builder';
+import { buildProductWhere, parseSlugList } from './products-query.builder';
 
 const ALLOWED_SORT_FIELDS = ['price', 'name', 'createdAt'] as const;
 
@@ -59,22 +59,27 @@ export class ProductsService {
     const sort = resolveSortField(query.sort, ALLOWED_SORT_FIELDS, 'createdAt');
     const order = query.order ?? 'desc';
 
-    const [category, brand] = await Promise.all([
-      query.category ? this.prisma.category.findUnique({ where: { slug: query.category } }) : null,
-      query.brand ? this.prisma.brand.findUnique({ where: { slug: query.brand } }) : null,
+    const categorySlugs = parseSlugList(query.category);
+    const brandSlugs = parseSlugList(query.brand);
+
+    const [categories, brands] = await Promise.all([
+      categorySlugs.length
+        ? this.prisma.category.findMany({ where: { slug: { in: categorySlugs } } })
+        : [],
+      brandSlugs.length ? this.prisma.brand.findMany({ where: { slug: { in: brandSlugs } } }) : [],
     ]);
     // An unknown category/brand slug should yield an empty result set, not every product.
-    if (query.category && !category) {
+    if (categorySlugs.length && categories.length === 0) {
       return { data: [], meta: buildPaginationMeta(page, limit, 0) };
     }
-    if (query.brand && !brand) {
+    if (brandSlugs.length && brands.length === 0) {
       return { data: [], meta: buildPaginationMeta(page, limit, 0) };
     }
 
     const where = buildProductWhere(query, {
       isAdmin,
-      categoryId: category?.id,
-      brandId: brand?.id,
+      categoryIds: categories.map((c) => c.id),
+      brandIds: brands.map((b) => b.id),
     });
 
     const [data, total] = await Promise.all([
