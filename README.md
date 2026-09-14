@@ -129,6 +129,35 @@ npm run dev                # http://localhost:5174
 > The admin dev server's default port (5174) is already included in the backend's
 > `CORS_ORIGINS`. If you change it, update `apps/backend/.env` to match.
 
+### 3.5 Running all three servers together
+
+Each app (§3.2–3.4) is its own long-running process — start them in **three separate
+terminal tabs/windows**, left open, one command per tab:
+
+```bash
+# terminal 1
+cd apps/backend && npm run start:dev
+
+# terminal 2
+cd apps/storefront && npm run dev
+
+# terminal 3
+cd apps/admin && npm run dev
+```
+
+(Run the one-time `npm install`/`.env` setup from §3.2–3.4 first if you haven't already.)
+Once all three are up:
+
+| App              | URL                          |
+| ----------------- | ----------------------------- |
+| Backend API        | http://localhost:4000/api    |
+| Swagger docs       | http://localhost:4000/docs   |
+| Storefront          | http://localhost:3000        |
+| Admin dashboard     | http://localhost:5174        |
+
+Start the backend first — the storefront and admin both call it on load and will show
+fetch errors until it's up. To stop a server, focus its terminal and press `Ctrl+C`.
+
 ---
 
 ## 4. Environment Variables
