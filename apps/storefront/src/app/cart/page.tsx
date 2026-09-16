@@ -48,7 +48,7 @@ export default function CartPage() {
         <EmptyState
           title="Your cart is empty"
           description="Browse our catalog and add something to your cart."
-          actionHref="/products"
+          actionHref="/store"
           actionLabel="Start Shopping"
         />
       </div>

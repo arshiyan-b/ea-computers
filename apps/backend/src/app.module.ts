@@ -12,6 +12,7 @@ import { CartModule } from './cart/cart.module';
 import { CheckoutModule } from './checkout/checkout.module';
 import { OrdersModule } from './orders/orders.module';
 import { AdminModule } from './admin/admin.module';
+import { LeadsModule } from './leads/leads.module';
 import { UploadsModule } from './uploads/uploads.module';
 import { HealthModule } from './health/health.module';
 import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
@@ -32,6 +33,7 @@ import { RolesGuard } from './auth/guards/roles.guard';
     CheckoutModule,
     OrdersModule,
     AdminModule,
+    LeadsModule,
     UploadsModule,
   ],
   providers: [

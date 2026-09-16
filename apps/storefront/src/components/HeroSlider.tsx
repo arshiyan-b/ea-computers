@@ -23,7 +23,7 @@ const SLIDES: Slide[] = [
     ),
     description:
       'Genuine laptops, desktop PCs, graphics cards and components — competitively priced, with Cash on Delivery available nationwide.',
-    primaryCta: { label: 'Shop All Products', href: '/products' },
+    primaryCta: { label: 'Shop All Products', href: '/store' },
     secondaryCta: { label: 'Browse Graphics Cards', href: '/categories/graphics-cards' },
     image: 'https://picsum.photos/seed/ea-computers-hero/1600/900',
   },
@@ -60,7 +60,7 @@ const SLIDES: Slide[] = [
     ),
     description:
       'Hand-picked discounts on flagship hardware — while stocks last. New deals added regularly.',
-    primaryCta: { label: 'View Deals', href: '/products' },
+    primaryCta: { label: 'View Deals', href: '/store' },
     image: 'https://picsum.photos/seed/ea-computers-deals/1600/900',
   },
   {
@@ -84,7 +84,7 @@ const SLIDES: Slide[] = [
     ),
     description:
       'Every item ships with full manufacturer warranty — pay in cash only when it arrives at your door.',
-    primaryCta: { label: 'Start Shopping', href: '/products' },
+    primaryCta: { label: 'Start Shopping', href: '/store' },
     image: 'https://picsum.photos/seed/ea-computers-delivery/1600/900',
   },
 ];

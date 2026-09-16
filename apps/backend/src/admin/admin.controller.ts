@@ -5,8 +5,10 @@ import { IsInt, Min } from 'class-validator';
 import { AdminService } from './admin.service';
 import { OrdersService } from '../orders/orders.service';
 import { UsersService } from '../users/users.service';
+import { LeadsService } from '../leads/leads.service';
 import { QueryOrderDto } from '../orders/dto/query-order.dto';
 import { UpdateOrderStatusDto } from '../orders/dto/update-order-status.dto';
+import { QueryLeadDto } from '../leads/dto/query-lead.dto';
 import { Roles } from '../auth/decorators/roles.decorator';
 
 class PaginationOnlyDto {
@@ -30,6 +32,7 @@ export class AdminController {
     private readonly adminService: AdminService,
     private readonly ordersService: OrdersService,
     private readonly usersService: UsersService,
+    private readonly leadsService: LeadsService,
   ) {}
 
   @Get('dashboard')
@@ -60,5 +63,11 @@ export class AdminController {
   @ApiOperation({ summary: '[Admin] List customers & admins' })
   findAllUsers(@Query() query: PaginationOnlyDto) {
     return this.usersService.findAllPaginated(query.page ?? 1, query.limit ?? 20);
+  }
+
+  @Get('leads')
+  @ApiOperation({ summary: '[Admin] List "Get in Touch" leads submitted from the storefront' })
+  findAllLeads(@Query() query: QueryLeadDto) {
+    return this.leadsService.findAllForAdmin(query);
   }
 }

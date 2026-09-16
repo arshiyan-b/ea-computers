@@ -253,3 +253,21 @@ model OrderItem {
   @@index([productId])
   @@map("order_items")
 }
+
+// ---------------------------------------------------------------------------
+// Leads — "Get in Touch" submissions from firms interested in our networking
+// and IT services. Public write (anyone can submit), admin-only read.
+// ---------------------------------------------------------------------------
+
+model Lead {
+  id        String   @id @default(cuid())
+  name      String
+  email     String
+  phone     String?
+  company   String?
+  message   String
+  createdAt DateTime @default(now())
+
+  @@index([createdAt])
+  @@map("leads")
+}

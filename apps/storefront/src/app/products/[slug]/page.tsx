@@ -57,7 +57,7 @@ export default async function ProductDetailPage({ params }: Props) {
   return (
     <div className="container-page py-8">
       <nav className="mb-6 text-sm text-slate-500">
-        <Link href="/products" className="hover:text-brand-700">
+        <Link href="/store" className="hover:text-brand-700">
           Products
         </Link>
         <span className="mx-2">/</span>
@@ -72,7 +72,7 @@ export default async function ProductDetailPage({ params }: Props) {
         <div>
           {product.brand && (
             <Link
-              href={`/products?brand=${product.brand.slug}`}
+              href={`/store?brand=${product.brand.slug}`}
               className="text-sm font-semibold uppercase tracking-wide text-brand-700"
             >
               {product.brand.name}

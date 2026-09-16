@@ -4,7 +4,7 @@ const FOOTER_LINKS: { title: string; links: { href: string; label: string }[] }[
   {
     title: 'Shop',
     links: [
-      { href: '/products', label: 'All Products' },
+      { href: '/store', label: 'All Products' },
       { href: '/categories/laptops', label: 'Laptops' },
       { href: '/categories/desktop-pcs', label: 'Desktop PCs' },
       { href: '/categories/graphics-cards', label: 'Graphics Cards' },
@@ -22,7 +22,10 @@ const FOOTER_LINKS: { title: string; links: { href: string; label: string }[] }[
   {
     title: 'Company',
     links: [
-      { href: '/', label: 'About EA Computers' },
+      { href: '/#about', label: 'About Us' },
+      { href: '/#team', label: 'Our Team' },
+      { href: '/#testimonials', label: 'Testimonials' },
+      { href: '/#contact', label: 'Get in Touch' },
       { href: '/checkout', label: 'Shipping & Payment' },
     ],
   },

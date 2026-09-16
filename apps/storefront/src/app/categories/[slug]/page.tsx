@@ -93,7 +93,7 @@ export default async function CategoryPage({ params, searchParams }: Props) {
             <EmptyState
               title="No products in this category yet"
               description="Check back soon, or browse our full catalog."
-              actionHref="/products"
+              actionHref="/store"
               actionLabel="Browse all products"
             />
           ) : (

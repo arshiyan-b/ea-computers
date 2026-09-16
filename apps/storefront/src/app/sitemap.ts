@@ -10,7 +10,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     listCategories({ limit: 50 }).catch(() => ({ data: [], meta: null })),
   ]);
 
-  const staticRoutes: MetadataRoute.Sitemap = ['', '/products', '/cart', '/login', '/register'].map(
+  const staticRoutes: MetadataRoute.Sitemap = ['', '/store', '/cart', '/login', '/register'].map(
     (path) => ({ url: `${SITE_URL}${path}`, changeFrequency: 'daily', priority: path === '' ? 1 : 0.7 }),
   );
 

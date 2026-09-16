@@ -10,6 +10,7 @@ const INCLUDE_INACTIVE_RESOURCES = new Set(['products', 'categories', 'brands'])
 const RESOURCE_PATHS: Record<string, string> = {
   orders: '/admin/orders',
   users: '/admin/users',
+  leads: '/admin/leads',
   // Inventory is a read-only, stock-focused view over the same Products API.
   inventory: '/products',
 };
@@ -30,6 +31,7 @@ const ALLOWED_FILTER_FIELDS: Record<string, string[]> = {
   brands: [],
   orders: ['status'],
   users: [],
+  leads: [],
 };
 
 function applyFilters(resource: string, params: URLSearchParams, filters?: CrudFilters) {

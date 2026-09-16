@@ -82,7 +82,7 @@ export default function CheckoutPage() {
         <EmptyState
           title="Your cart is empty"
           description="Add some products before checking out."
-          actionHref="/products"
+          actionHref="/store"
           actionLabel="Start Shopping"
         />
       </div>
@@ -269,7 +269,7 @@ function OrderConfirmation({ order }: { order: Order }) {
         </div>
 
         <div className="mt-6 flex justify-center gap-3">
-          <Link href="/products" className="rounded-md border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-white">
+          <Link href="/store" className="rounded-md border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-white">
             Continue Shopping
           </Link>
           <Link href="/account/orders" className="rounded-md bg-brand-700 px-4 py-2 text-sm font-medium text-white transition-all hover:bg-brand-800 hover:-translate-y-0.5 active:translate-y-0">

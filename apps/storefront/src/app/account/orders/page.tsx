@@ -45,7 +45,7 @@ function OrdersContent() {
         <EmptyState
           title="No orders yet"
           description="Once you place an order, it will show up here."
-          actionHref="/products"
+          actionHref="/store"
           actionLabel="Start Shopping"
         />
       )}

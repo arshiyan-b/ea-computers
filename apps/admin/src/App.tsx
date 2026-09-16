@@ -23,6 +23,7 @@ import {
   ShoppingCartOutlined,
   TeamOutlined,
   DatabaseOutlined,
+  MailOutlined,
 } from '@ant-design/icons';
 
 import { dataProvider } from './providers/dataProvider';
@@ -35,6 +36,7 @@ import { CategoryList, CategoryCreate, CategoryEdit } from './pages/categories';
 import { BrandList, BrandCreate, BrandEdit } from './pages/brands';
 import { OrderList, OrderShow } from './pages/orders';
 import { UserList } from './pages/users';
+import { LeadList } from './pages/leads';
 import { InventoryList } from './pages/inventory';
 import { Title } from './components/Title';
 
@@ -87,6 +89,11 @@ function App() {
                 list: '/users',
                 meta: { label: 'Users', icon: <TeamOutlined /> },
               },
+              {
+                name: 'leads',
+                list: '/leads',
+                meta: { label: 'Leads', icon: <MailOutlined /> },
+              },
             ]}
             options={{
               syncWithLocation: true,
@@ -131,6 +138,7 @@ function App() {
 
                 <Route path="/inventory" element={<InventoryList />} />
                 <Route path="/users" element={<UserList />} />
+                <Route path="/leads" element={<LeadList />} />
 
                 <Route path="*" element={<ErrorComponent />} />
               </Route>

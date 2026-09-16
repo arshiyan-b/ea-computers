@@ -7,7 +7,7 @@ import { useAuthStore } from '@/store/auth-store';
 import { useCartStore } from '@/store/cart-store';
 
 const NAV_LINKS = [
-  { href: '/products', label: 'All Products' },
+  { href: '/store', label: 'Shop' },
   { href: '/categories/graphics-cards', label: 'Graphics Cards' },
   { href: '/categories/laptops', label: 'Laptops' },
   { href: '/categories/desktop-pcs', label: 'Desktop PCs' },
@@ -30,7 +30,7 @@ export function Header() {
   function handleSearch(e: React.FormEvent) {
     e.preventDefault();
     const q = query.trim();
-    router.push(q ? `/products?search=${encodeURIComponent(q)}` : '/products');
+    router.push(q ? `/store?search=${encodeURIComponent(q)}` : '/store');
     setMobileOpen(false);
   }
 
