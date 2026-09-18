@@ -1,14 +1,16 @@
 import { NestFactory } from '@nestjs/core';
+import { FastifyAdapter, NestFastifyApplication } from '@nestjs/platform-fastify';
 import { ConfigService } from '@nestjs/config';
 import { ValidationPipe } from '@nestjs/common';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
-import helmet from 'helmet';
-import cookieParser from 'cookie-parser';
+import fastifyHelmet from '@fastify/helmet';
+import fastifyCookie from '@fastify/cookie';
+import fastifyMultipart from '@fastify/multipart';
 import { AppModule } from './app.module';
 import { HttpExceptionFilter } from './common/filters/http-exception.filter';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule, {
+  const app = await NestFactory.create<NestFastifyApplication>(AppModule, new FastifyAdapter(), {
     logger: ['error', 'warn', 'log'],
   });
   const config = app.get(ConfigService);
@@ -16,8 +18,13 @@ async function bootstrap() {
   const apiPrefix = config.get<string>('API_PREFIX', 'api');
   app.setGlobalPrefix(apiPrefix);
 
-  app.use(helmet());
-  app.use(cookieParser(config.get<string>('CART_COOKIE_SECRET')));
+  await app.register(fastifyHelmet);
+  await app.register(fastifyCookie, {
+    secret: config.get<string>('CART_COOKIE_SECRET'),
+  });
+  await app.register(fastifyMultipart, {
+    limits: { fileSize: 8 * 1024 * 1024 }, // hard transport ceiling; UploadsService enforces the real 5MB limit
+  });
 
   const corsOrigins = (config.get<string>('CORS_ORIGINS') ?? 'http://localhost:3000')
     .split(',')
@@ -64,7 +71,9 @@ async function bootstrap() {
   });
 
   const port = config.get<number>('PORT', 4000);
-  await app.listen(port);
+  // Fastify defaults to binding 127.0.0.1 only (unlike Express) — bind all
+  // interfaces so the API is reachable from other containers/hosts.
+  await app.listen(port, '0.0.0.0');
   // eslint-disable-next-line no-console
   console.log(`EA Computers API listening on http://localhost:${port}/${apiPrefix}`);
   // eslint-disable-next-line no-console

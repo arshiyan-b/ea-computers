@@ -1,7 +1,7 @@
 import { Body, Controller, Delete, Get, Param, Patch, Post, Req, Res } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
-import { Request, Response } from 'express';
+import type { FastifyReply, FastifyRequest } from 'fastify';
 import { CartService } from './cart.service';
 import { AddCartItemDto } from './dto/add-cart-item.dto';
 import { UpdateCartItemDto } from './dto/update-cart-item.dto';
@@ -26,8 +26,8 @@ export class CartController {
   @Get()
   @ApiOperation({ summary: 'Get the current guest or authenticated cart' })
   async getCart(
-    @Req() req: Request,
-    @Res({ passthrough: true }) res: Response,
+    @Req() req: FastifyRequest,
+    @Res({ passthrough: true }) res: FastifyReply,
     @CurrentUser() user?: AuthenticatedUser,
   ) {
     const sessionId = resolveGuestSessionId(req, res, this.cookieName, !!user);
@@ -40,8 +40,8 @@ export class CartController {
   @ApiOperation({ summary: 'Add a product to the cart (or increase its quantity)' })
   async addItem(
     @Body() dto: AddCartItemDto,
-    @Req() req: Request,
-    @Res({ passthrough: true }) res: Response,
+    @Req() req: FastifyRequest,
+    @Res({ passthrough: true }) res: FastifyReply,
     @CurrentUser() user?: AuthenticatedUser,
   ) {
     const sessionId = resolveGuestSessionId(req, res, this.cookieName, !!user);
@@ -55,8 +55,8 @@ export class CartController {
   async updateItem(
     @Param('id') itemId: string,
     @Body() dto: UpdateCartItemDto,
-    @Req() req: Request,
-    @Res({ passthrough: true }) res: Response,
+    @Req() req: FastifyRequest,
+    @Res({ passthrough: true }) res: FastifyReply,
     @CurrentUser() user?: AuthenticatedUser,
   ) {
     const sessionId = resolveGuestSessionId(req, res, this.cookieName, !!user);
@@ -69,8 +69,8 @@ export class CartController {
   @ApiOperation({ summary: 'Remove an item from the cart' })
   async removeItem(
     @Param('id') itemId: string,
-    @Req() req: Request,
-    @Res({ passthrough: true }) res: Response,
+    @Req() req: FastifyRequest,
+    @Res({ passthrough: true }) res: FastifyReply,
     @CurrentUser() user?: AuthenticatedUser,
   ) {
     const sessionId = resolveGuestSessionId(req, res, this.cookieName, !!user);

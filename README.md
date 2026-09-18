@@ -3,14 +3,18 @@
 A production-quality e-commerce platform for a Pakistani computer & technology hardware
 retailer — laptops, desktops, GPUs, CPUs, components, peripherals and accessories.
 
-Built as a modular monolith:
+Built as a modular monolith, tuned to run comfortably on a small/shared VPS:
 
-- **Backend** — NestJS + PostgreSQL + Prisma, REST API, JWT auth, Swagger docs
-- **Storefront** — Next.js (App Router) + TypeScript + Tailwind CSS + Zustand
-- **Admin** — Refine + Ant Design, consuming the same REST API
+- **Backend** — NestJS on the Fastify adapter + PostgreSQL + Prisma, REST API, JWT auth,
+  Swagger docs
+- **Storefront** — Next.js (App Router), built as a **static export** (no Node server in
+  production — data is fetched client-side, so nginx alone can serve it) + TypeScript +
+  Tailwind CSS + Zustand
+- **Admin** — Refine + Ant Design, a static Vite SPA, consuming the same REST API
 
-Everything runs as plain Node.js processes on your machine — no containers anywhere in
-this project.
+In production this is one lightweight Node process (the backend) plus two folders of
+static files served by nginx — not three persistent Node servers. Locally, everything
+still runs as plain Node.js processes — no containers anywhere in this project.
 
 ---
 
@@ -51,7 +55,7 @@ migrating/seeding the database) — that's covered in §3 below.
                                           │  REST API (JWT bearer + guest cart cookie)
                     Refine Admin ────────►│
                                           v
-                                 NestJS Backend API
+                              NestJS Backend API (Fastify)
                                           |
                      +--------------------+--------------------+
                      |                    |                    |
@@ -216,7 +220,7 @@ Postgres database, per `DATABASE_URL`):
 
 ```bash
 cd apps/backend
-npm test                 # 44 unit tests — auth, products, cart, checkout, orders, guards
+npm test                 # 45 unit tests — auth, products, cart, checkout, orders, guards
 npm run test:e2e         # 33 e2e tests — full HTTP round-trips against a real database
 ```
 
@@ -244,15 +248,21 @@ protected endpoints interactively.
 ## 8. Production deployment notes
 
 There's no Docker setup in this project by design — deploy each app the way you'd deploy
-any plain Node.js/static app:
+any plain Node.js/static app. Only the **backend** needs a persistent Node process; the
+storefront and admin are both plain static files nginx can serve directly, which matters
+if this shares a small VPS with other services:
 
 - **Backend**: `npm run build` then `node dist/main.js` (run `npx prisma migrate deploy`
   against the production database first). Needs a long-lived process manager (systemd,
   pm2, your host's equivalent) and all the `.env` variables set as real environment
-  variables, not a checked-in file.
-- **Storefront**: `npm run build` then `npm run start` (Next.js's own Node server), or
-  deploy to any platform with first-class Next.js support. `NEXT_PUBLIC_API_URL` is baked
-  in at build time — set it before building.
+  variables, not a checked-in file. It's a Fastify app under the hood and binds `0.0.0.0`
+  by default (see `main.ts`), so it's reachable from other containers/hosts out of the box.
+- **Storefront**: `npm run build` produces a static `out/` folder (`output: 'export'` in
+  `next.config.mjs` — no Next.js server to run in production). Point nginx's document root
+  at `apps/storefront/out`, with `error_page 404 /404.html;` so unknown product/category
+  URLs still get the client-rendered not-found page (which itself fetches by slug, so
+  products added after the last build still resolve without a rebuild). `NEXT_PUBLIC_API_URL`
+  is baked in at build time — set it before building.
 - **Admin**: `npm run build` produces a static `dist/` folder (Vite) — serve it from any
   static host/CDN with SPA fallback routing (rewrite all paths to `index.html`).
   `VITE_API_URL` is also baked in at build time.

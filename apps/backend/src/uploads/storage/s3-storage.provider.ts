@@ -3,7 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import { PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
 import { randomUUID } from 'crypto';
 import { extname } from 'path';
-import { StorageProvider, UploadedFileResult } from './storage-provider.interface';
+import { StorageProvider, UploadableFile, UploadedFileResult } from './storage-provider.interface';
 
 /**
  * Works with AWS S3 and any S3-compatible service (MinIO, Spaces, R2, ...).
@@ -35,7 +35,7 @@ export class S3StorageProvider implements StorageProvider {
     return this.client;
   }
 
-  async upload(file: Express.Multer.File, folder = 'products'): Promise<UploadedFileResult> {
+  async upload(file: UploadableFile, folder = 'products'): Promise<UploadedFileResult> {
     const client = this.getClient();
     const key = `${folder}/${randomUUID()}${extname(file.originalname)}`;
     await client.send(

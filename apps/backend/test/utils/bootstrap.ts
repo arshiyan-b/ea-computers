@@ -1,15 +1,18 @@
-import { INestApplication, ValidationPipe } from '@nestjs/common';
+import { ValidationPipe } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
-import cookieParser from 'cookie-parser';
+import { FastifyAdapter, NestFastifyApplication } from '@nestjs/platform-fastify';
+import fastifyCookie from '@fastify/cookie';
+import fastifyMultipart from '@fastify/multipart';
 import { AppModule } from '../../src/app.module';
 import { HttpExceptionFilter } from '../../src/common/filters/http-exception.filter';
 
 /** Boots a full Nest application (real Postgres, per DATABASE_URL) for e2e tests. */
-export async function bootstrapTestApp(): Promise<INestApplication> {
+export async function bootstrapTestApp(): Promise<NestFastifyApplication> {
   const moduleRef = await Test.createTestingModule({ imports: [AppModule] }).compile();
-  const app = moduleRef.createNestApplication();
+  const app = moduleRef.createNestApplication<NestFastifyApplication>(new FastifyAdapter());
 
-  app.use(cookieParser(process.env.CART_COOKIE_SECRET ?? 'test-secret'));
+  await app.register(fastifyCookie, { secret: process.env.CART_COOKIE_SECRET ?? 'test-secret' });
+  await app.register(fastifyMultipart);
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,
@@ -22,6 +25,7 @@ export async function bootstrapTestApp(): Promise<INestApplication> {
   app.setGlobalPrefix('api');
 
   await app.init();
+  await app.getHttpAdapter().getInstance().ready();
   return app;
 }
 

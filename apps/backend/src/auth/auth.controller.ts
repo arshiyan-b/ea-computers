@@ -1,7 +1,7 @@
 import { Body, Controller, Get, HttpCode, HttpStatus, Post, Req, Res } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
-import { Request, Response } from 'express';
+import type { FastifyReply, FastifyRequest } from 'fastify';
 import { AuthService } from './auth.service';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
@@ -32,8 +32,8 @@ export class AuthController {
   @ApiOperation({ summary: 'Create a new customer account' })
   async register(
     @Body() dto: RegisterDto,
-    @Req() req: Request,
-    @Res({ passthrough: true }) res: Response,
+    @Req() req: FastifyRequest,
+    @Res({ passthrough: true }) res: FastifyReply,
   ): Promise<AuthResponseDto> {
     const result = await this.authService.register(dto);
     await this.mergeGuestCart(req, res, result.user.id);
@@ -46,15 +46,15 @@ export class AuthController {
   @ApiOperation({ summary: 'Log in with email and password' })
   async login(
     @Body() dto: LoginDto,
-    @Req() req: Request,
-    @Res({ passthrough: true }) res: Response,
+    @Req() req: FastifyRequest,
+    @Res({ passthrough: true }) res: FastifyReply,
   ): Promise<AuthResponseDto> {
     const result = await this.authService.login(dto);
     await this.mergeGuestCart(req, res, result.user.id);
     return result;
   }
 
-  private async mergeGuestCart(req: Request, res: Response, userId: string) {
+  private async mergeGuestCart(req: FastifyRequest, res: FastifyReply, userId: string) {
     const guestSessionId = readGuestSessionId(req, this.cartCookieName);
     if (!guestSessionId) return;
     await this.cartService.mergeGuestCartIntoUser(guestSessionId, userId);

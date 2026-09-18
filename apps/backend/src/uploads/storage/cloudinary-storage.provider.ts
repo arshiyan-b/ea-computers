@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { v2 as cloudinary } from 'cloudinary';
-import { StorageProvider, UploadedFileResult } from './storage-provider.interface';
+import { StorageProvider, UploadableFile, UploadedFileResult } from './storage-provider.interface';
 
 @Injectable()
 export class CloudinaryStorageProvider implements StorageProvider {
@@ -19,7 +19,7 @@ export class CloudinaryStorageProvider implements StorageProvider {
     this.configured = true;
   }
 
-  upload(file: Express.Multer.File, folder = 'products'): Promise<UploadedFileResult> {
+  upload(file: UploadableFile, folder = 'products'): Promise<UploadedFileResult> {
     this.ensureConfigured();
     return new Promise((resolve, reject) => {
       const stream = cloudinary.uploader.upload_stream(

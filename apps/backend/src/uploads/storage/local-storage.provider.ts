@@ -3,7 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import { randomUUID } from 'crypto';
 import { extname, join } from 'path';
 import { mkdir, writeFile } from 'fs/promises';
-import { StorageProvider, UploadedFileResult } from './storage-provider.interface';
+import { StorageProvider, UploadableFile, UploadedFileResult } from './storage-provider.interface';
 
 /**
  * Default provider for local development: writes to ./uploads and serves it
@@ -16,7 +16,7 @@ export class LocalStorageProvider implements StorageProvider {
 
   constructor(private readonly config: ConfigService) {}
 
-  async upload(file: Express.Multer.File, folder = 'products'): Promise<UploadedFileResult> {
+  async upload(file: UploadableFile, folder = 'products'): Promise<UploadedFileResult> {
     const dir = join(this.uploadsDir, folder);
     await mkdir(dir, { recursive: true });
 
