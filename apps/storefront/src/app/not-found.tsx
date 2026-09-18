@@ -1,6 +1,26 @@
+'use client';
+
 import Link from 'next/link';
+import { useEffect, useState } from 'react';
+import { ProductDetailClient } from '@/components/ProductDetailClient';
+import { CategoryDetailClient } from '@/components/CategoryDetailClient';
 
 export default function NotFound() {
+  const [slugMatch, setSlugMatch] = useState<{ kind: 'products' | 'categories'; slug: string } | null | undefined>(
+    undefined,
+  );
+
+  useEffect(() => {
+    const path = window.location.pathname;
+    const match = path.match(/^\/(products|categories)\/([^/]+)\/?$/);
+    setSlugMatch(match ? { kind: match[1] as 'products' | 'categories', slug: match[2] } : null);
+  }, []);
+
+  if (slugMatch === undefined) return null;
+
+  if (slugMatch?.kind === 'products') return <ProductDetailClient slug={slugMatch.slug} />;
+  if (slugMatch?.kind === 'categories') return <CategoryDetailClient slug={slugMatch.slug} />;
+
   return (
     <div className="container-page flex min-h-[60vh] flex-col items-center justify-center text-center">
       <h1 className="text-6xl font-extrabold text-slate-200">404</h1>

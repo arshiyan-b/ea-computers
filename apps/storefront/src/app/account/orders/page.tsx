@@ -72,7 +72,7 @@ function OrdersContent() {
                   </td>
                   <td className="px-4 py-3 text-right font-medium text-slate-800">{formatPKR(order.total)}</td>
                   <td className="px-4 py-3 text-right">
-                    <Link href={`/account/orders/${order.id}`} className="text-brand-700 hover:underline">
+                    <Link href={`/account/orders/view?id=${order.id}`} className="text-brand-700 hover:underline">
                       View
                     </Link>
                   </td>

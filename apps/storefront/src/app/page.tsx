@@ -1,24 +1,66 @@
+'use client';
+
 import Link from 'next/link';
+import { useEffect, useState } from 'react';
 import { listProducts } from '@/lib/products';
 import { listCategories } from '@/lib/categories';
 import { listBrands } from '@/lib/brands';
 import { ProductCard } from '@/components/ProductCard';
 import { HeroSlider } from '@/components/HeroSlider';
 import { ContactForm } from '@/components/ContactForm';
+import type { Brand, Category, Product } from '@/types/api';
 
-export const revalidate = 60;
+interface HomeData {
+  featured: Product[];
+  bestSellers: Product[];
+  deals: Product[];
+  categories: Category[];
+  brands: Brand[];
+}
 
-export default async function HomePage() {
-  const [featured, bestSellers, deals, categories, brands] = await Promise.all([
-    listProducts({ featured: true, limit: 8 }),
-    listProducts({ stock: true, sort: 'price', order: 'desc', limit: 4 }),
-    listProducts({ sort: 'createdAt', order: 'desc', limit: 100 }).then((res) => ({
-      ...res,
-      data: res.data.filter((p) => p.compareAtPrice && Number(p.compareAtPrice) > Number(p.price)).slice(0, 4),
-    })),
-    listCategories({ topLevelOnly: false, limit: 12 }),
-    listBrands({ limit: 12 }),
-  ]);
+function useHomeData() {
+  const [data, setData] = useState<HomeData | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    Promise.all([
+      listProducts({ featured: true, limit: 8 }),
+      listProducts({ stock: true, sort: 'price', order: 'desc', limit: 4 }),
+      listProducts({ sort: 'createdAt', order: 'desc', limit: 100 }).then((res) => ({
+        ...res,
+        data: res.data.filter((p) => p.compareAtPrice && Number(p.compareAtPrice) > Number(p.price)).slice(0, 4),
+      })),
+      listCategories({ topLevelOnly: false, limit: 12 }),
+      listBrands({ limit: 12 }),
+    ])
+      .then(([featured, bestSellers, deals, categories, brands]) => {
+        if (cancelled) return;
+        setData({
+          featured: featured.data,
+          bestSellers: bestSellers.data,
+          deals: deals.data,
+          categories: categories.data,
+          brands: brands.data,
+        });
+      })
+      .catch(() => {});
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  return data;
+}
+
+export default function HomePage() {
+  const data = useHomeData();
+  const featured = data?.featured ?? [];
+  const bestSellers = data?.bestSellers ?? [];
+  const deals = data?.deals ?? [];
+  const categories = data?.categories ?? [];
+  const brands = data?.brands ?? [];
 
   return (
     <div>
@@ -33,7 +75,7 @@ export default async function HomePage() {
       <section className="container-page py-12">
         <SectionHeader title="Shop by Category" subtitle="Find exactly what your build needs" />
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
-          {categories.data.slice(0, 12).map((category, i) => (
+          {categories.slice(0, 12).map((category, i) => (
             <Link
               key={category.id}
               href={`/categories/${category.slug}`}
@@ -51,7 +93,7 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {featured.data.length > 0 && (
+      {featured.length > 0 && (
         <section className="container-page py-12">
           <SectionHeader
             title="Featured Products"
@@ -59,19 +101,19 @@ export default async function HomePage() {
             href="/store?featured=true"
           />
           <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
-            {featured.data.map((product, i) => (
+            {featured.map((product, i) => (
               <ProductCard key={product.id} product={product} index={i} />
             ))}
           </div>
         </section>
       )}
 
-      {bestSellers.data.length > 0 && (
+      {bestSellers.length > 0 && (
         <section className="bg-white py-12">
           <div className="container-page">
             <SectionHeader title="Best Sellers" subtitle="Our customers' favorite high-performance gear" />
             <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
-              {bestSellers.data.map((product, i) => (
+              {bestSellers.map((product, i) => (
                 <ProductCard key={product.id} product={product} index={i} />
               ))}
             </div>
@@ -79,11 +121,11 @@ export default async function HomePage() {
         </section>
       )}
 
-      {deals.data.length > 0 && (
+      {deals.length > 0 && (
         <section className="container-page py-12">
           <SectionHeader title="Deals" subtitle="Limited-time price drops" href="/store" />
           <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
-            {deals.data.map((product, i) => (
+            {deals.map((product, i) => (
               <ProductCard key={product.id} product={product} index={i} />
             ))}
           </div>
@@ -96,7 +138,7 @@ export default async function HomePage() {
             Trusted Brands We Carry
           </p>
           <div className="flex flex-wrap items-center justify-center gap-x-10 gap-y-4">
-            {brands.data.map((brand, i) => (
+            {brands.map((brand, i) => (
               <span
                 key={brand.id}
                 style={{ animationDelay: `${i * 30}ms` }}

@@ -1,12 +1,24 @@
-import { redirect } from 'next/navigation';
+'use client';
 
-interface Props {
-  searchParams: Record<string, string | undefined>;
+import { Suspense, useEffect } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
+
+export default function ProductsRedirectPage() {
+  return (
+    <Suspense fallback={null}>
+      <ProductsRedirect />
+    </Suspense>
+  );
 }
 
-export default function ProductsRedirectPage({ searchParams }: Props) {
-  const qs = new URLSearchParams(
-    Object.entries(searchParams).filter((entry): entry is [string, string] => entry[1] !== undefined)
-  ).toString();
-  redirect(qs ? `/store?${qs}` : '/store');
+function ProductsRedirect() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+
+  useEffect(() => {
+    const qs = searchParams.toString();
+    router.replace(qs ? `/store?${qs}` : '/store');
+  }, [router, searchParams]);
+
+  return null;
 }

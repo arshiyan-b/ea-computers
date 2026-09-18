@@ -1,7 +1,7 @@
 'use client';
 
-import { useParams } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { Suspense, useEffect, useState } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { RequireAuth } from '@/components/RequireAuth';
 import { OrderStatusBadge } from '@/components/OrderStatusBadge';
 import { getMyOrder } from '@/lib/orders';
@@ -11,17 +11,21 @@ import type { Order } from '@/types/api';
 export default function OrderDetailPage() {
   return (
     <RequireAuth>
-      <OrderDetailContent />
+      <Suspense fallback={null}>
+        <OrderDetailContent />
+      </Suspense>
     </RequireAuth>
   );
 }
 
 function OrderDetailContent() {
-  const { id } = useParams<{ id: string }>();
+  const searchParams = useSearchParams();
+  const id = searchParams.get('id') ?? '';
   const [order, setOrder] = useState<Order | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    if (!id) return;
     getMyOrder(id)
       .then(setOrder)
       .catch((err) => setError(err instanceof Error ? err.message : 'Failed to load order'));
